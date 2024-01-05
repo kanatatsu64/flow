@@ -2,7 +2,6 @@ import sys
 import subprocess
 
 def exec(command):
-    print(command)
     return subprocess.run(command, capture_output=True, text=True, shell=True).stdout
 
 def usage():
