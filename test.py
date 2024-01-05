@@ -37,7 +37,7 @@ class TestFlow(unittest.TestCase):
 
         commands = [
             'echo "sample/1234" > .git/flow_current',
-            'echo "base_branch" > .git/flow/sample_1234'
+            'echo "base_branch" > .git/flow/sample_#_1234'
         ]
         history = mock.get("echo")
         self.assertEqual(len(history), 2)
@@ -54,7 +54,7 @@ class TestFlow(unittest.TestCase):
 
         commands = [
             'echo "sample/1234" > .git/flow_current',
-            'echo "develop/sample/1234" > .git/flow/sample_1234'
+            'echo "develop/sample/1234" > .git/flow/sample_#_1234'
         ]
         history = mock.get("echo")
         self.assertEqual(len(history), 2)
@@ -76,7 +76,7 @@ class TestFlow(unittest.TestCase):
 
         commands = [
             'echo "sample/1234" > .git/flow_current',
-            'echo "develop/sample/1234" > .git/flow/sample_1234'
+            'echo "develop/sample/1234" > .git/flow/sample_#_1234'
         ]
         history = mock.get("echo")
         self.assertEqual(len(history), 2)
@@ -86,7 +86,7 @@ class TestFlow(unittest.TestCase):
     def test_start(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_1234", "base_branch")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
         flow = Flow(mock.exec, mock.print)
 
         flow_name = "sample/1234"
@@ -118,7 +118,7 @@ class TestFlow(unittest.TestCase):
     def test_flow_checkout_1(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_1234", "base_branch")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
         mock.default("git branch --list feature/sample/1234/new", "")
         flow = Flow(mock.exec, mock.print)
 
@@ -133,7 +133,7 @@ class TestFlow(unittest.TestCase):
     def test_flow_checkout_2(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_1234", "base_branch")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
         mock.default("git branch --list feature/sample/1234/new", "* feature/sample/1234/new")
         flow = Flow(mock.exec, mock.print)
 
@@ -148,7 +148,7 @@ class TestFlow(unittest.TestCase):
     def test_flow_checkout_3(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_1234", "base_branch")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
         flow = Flow(mock.exec, mock.print)
 
         flow.checkout()
@@ -194,7 +194,7 @@ class TestFlow(unittest.TestCase):
     def test_flow_rebase(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_1234", "base_branch")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
         flow = Flow(mock.exec, mock.print)
 
         flow.rebase()
@@ -208,17 +208,33 @@ class TestFlow(unittest.TestCase):
         self.assertEqual(history[0], commands[0])
         self.assertEqual(history[1], commands[1])
     
-    def test_flow_list(self):
+    def test_flow_feature_list(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
         mock.default("git branch --list 'feature/sample/1234/*' | tr '*' ' '", " feature/sample/1234/new\n feature/sample/1234/old")
         flow = Flow(mock.exec, mock.print)
 
-        flow.list()
+        flow.feature_list()
 
         commands = [
             'echo "new"',
             'echo "old"'
+        ]
+        history = mock.get("echo")
+        self.assertEqual(len(history), 2)
+        self.assertEqual(history[0], commands[0])
+        self.assertEqual(history[1], commands[1])
+
+    def test_flow_flow_list(self):
+        mock = ProcessMock()
+        mock.default("ls .git/flow/*", ".git/flow/sample .git/flow/sample_#_1234")
+        flow = Flow(mock.exec, mock.print)
+
+        flow.flow_list()
+
+        commands = [
+            'echo "sample"',
+            'echo "sample/1234"'
         ]
         history = mock.get("echo")
         self.assertEqual(len(history), 2)

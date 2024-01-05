@@ -2,14 +2,23 @@ import sys
 import subprocess
 
 def exec(command):
-    return subprocess.run(command, capture_output=True, text=True, shell=True).stdout
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+
+    if not (result.returncode == 0):
+        print(command)
+        print(result.stdout)
+        print(result.stderr, file=sys.stderr)
+        sys.exit(1)
+
+    return result.stdout
 
 def usage():
     print("flow init <flow_name> [<base_branch>]")
     print("flow start <flow_name>")
     print("flow checkout <feature_name>")
     print("flow delete <feature_name>")
-    print("flow list")
+    print("flow feature-list")
+    print("flow flow-list")
     print("flow push")
     print("flow rebase")
     sys.exit(1)
@@ -72,12 +81,17 @@ class Flow:
 
         self.exec(f"git branch -D {feature_branch}")
     
-    def list(self):
+    def feature_list(self):
         flow_name = self.get_flow_name()
         pattern = f"feature/{flow_name}/*"
         lines = self.exec(f"git branch --list '{pattern}' | tr '*' ' '").splitlines()
         for line in lines:
             self.print(line.strip()[len(pattern)-1:])
+
+    def flow_list(self):
+        flow_names = self.get_flow_names()
+        for flow_name in flow_names:
+            self.print(flow_name)
 
     def push(self):
         flow_name = self.get_flow_name()
@@ -105,13 +119,17 @@ class Flow:
     def get_flow_name(self):
         return self.exec("cat .git/flow_current").strip()
 
+    def get_flow_names(self):
+        paths = self.exec("ls .git/flow/*").split()
+        return [path.split("/")[-1].replace("_#_", "/") for path in paths]
+
     def set_base_branch(self, flow_name, base_branch):
-        parsed_flow_name = flow_name.replace("/", "_")
+        parsed_flow_name = flow_name.replace("/", "_#_")
         self.exec(f"mkdir -p .git/flow")
         self.exec(f"echo \"{base_branch}\" > .git/flow/{parsed_flow_name}")
     
     def get_base_branch(self, flow_name):
-        parsed_flow_name = flow_name.replace("/", "_")
+        parsed_flow_name = flow_name.replace("/", "_#_")
         return self.exec(f"cat .git/flow/{parsed_flow_name}").strip()
 
     def set_feature_name(self, feature_name):
@@ -149,8 +167,11 @@ if __name__ == '__main__':
         if len(args) == 2:
             flow.delete(args[1])
             sys.exit(0)
-    elif args[0] == "list":
-        flow.list()
+    elif args[0] == "feature-list":
+        flow.feature_list()
+        sys.exit(0)
+    elif args[0] == "flow-list":
+        flow.flow_list()
         sys.exit(0)
     elif args[0] == "push":
         flow.push()
