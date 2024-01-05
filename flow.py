@@ -61,6 +61,15 @@ class Flow:
         base_branch = self.get_base_branch(flow_name)
 
         self.exec(f"git checkout {base_branch}")
+
+    def delete(self, feature_name):
+        flow_name = self.get_flow_name()
+        feature_branch = f"feature/{flow_name}/{feature_name}"
+
+        if not self.exists(feature_branch):
+            usage()
+
+        self.exec(f"git branch -D {feature_branch}")
     
     def list(self):
         flow_name = self.get_flow_name()
