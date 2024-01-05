@@ -15,7 +15,7 @@ class ProcessMock:
     def default(self, command, value=None):
         self.caches[command] = value
 
-    def exec(self, command):
+    def exec(self, command, suppress_error=False):
         self.history.append(command)
 
         for key in self.caches.keys():

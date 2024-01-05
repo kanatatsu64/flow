@@ -27,11 +27,15 @@ function _flow_completion(){
 }
 
 function _flow_name(){
-    _values 'flow name' $(flow flow-list | tr '\n' ' ')
+    local -a list
+    list=($(flow flow-list | tr '\n' ' '))
+    [[ !  -z  $list  ]] &&  _values 'flow name' $list
 }
 
 function _feature_name(){
-    _values 'fearute name' $(flow feature-list | tr '\n' ' ')
+    local -a list
+    list=($(flow feature-list | tr '\n' ' '))
+    [[ !  -z  $list  ]] &&  _values 'flow name' $list
 }
 
 compdef _flow_completion flow

@@ -1,10 +1,10 @@
 import sys
 import subprocess
 
-def exec(command):
+def exec(command, suppress_error=False):
     result = subprocess.run(command, capture_output=True, text=True, shell=True)
 
-    if not (result.returncode == 0):
+    if (not (result.returncode == 0)) and (not suppress_error):
         print(command)
         print(result.stdout)
         print(result.stderr, file=sys.stderr)
@@ -120,7 +120,7 @@ class Flow:
         return self.exec("cat .git/flow_current").strip()
 
     def get_flow_names(self):
-        paths = self.exec("ls .git/flow/*").split()
+        paths = self.exec("ls .git/flow/*", True).split()
         return [path.split("/")[-1].replace("_#_", "/") for path in paths]
 
     def set_base_branch(self, flow_name, base_branch):
@@ -130,7 +130,7 @@ class Flow:
     
     def get_base_branch(self, flow_name):
         parsed_flow_name = flow_name.replace("/", "_#_")
-        return self.exec(f"cat .git/flow/{parsed_flow_name}").strip()
+        return self.exec(f"cat .git/flow/{parsed_flow_name}", True).strip()
 
     def set_feature_name(self, feature_name):
         self.exec(f"echo \"{feature_name}\" > .git/flow_current_feature")
