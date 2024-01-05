@@ -8,6 +8,7 @@ def usage():
     print("flow init <flow_name> [<base_branch>]")
     print("flow start <flow_name>")
     print("flow checkout <feature_name>")
+    print("flow delete <feature_name>")
     print("flow list")
     print("flow push")
     print("flow rebase")
