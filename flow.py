@@ -144,6 +144,10 @@ if __name__ == '__main__':
         elif len(args) == 2:
             flow.checkout(args[1])
             sys.exit(0)
+    elif args[0] == "checkout":
+        if len(args) == 2:
+            flow.delete(args[1])
+            sys.exit(0)
     elif args[0] == "list":
         flow.list()
         sys.exit(0)
