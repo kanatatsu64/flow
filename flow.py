@@ -3,10 +3,12 @@ import sys
 import subprocess
 
 def exec(command, suppress_error=False):
-    lines, columns = subprocess.run("stty size", capture_output=True, text=True, shell=True).stdout.split()
     env = os.environ.copy()
-    env["LINES"] = lines
-    env["COLUMNS"] = columns
+    stty = subprocess.run("stty size", capture_output=True, text=True, shell=True).stdout
+    if not (stty == ""):
+        lines, columns = stty.split()
+        env["LINES"] = lines
+        env["COLUMNS"] = columns
 
     result = subprocess.run(command, capture_output=True, text=True, shell=True, env=env)
 
@@ -90,7 +92,7 @@ class Flow:
     def feature_list(self):
         flow_name = self.get_flow_name()
         pattern = f"feature/{flow_name}/*"
-        lines = self.exec(f"git branch --list '{pattern}' | tr '*' ' '").splitlines()
+        lines = self.exec(f"git branch --list '{pattern}' | sed 's/^[* ] //'").splitlines()
         for line in lines:
             self.print(line.strip()[len(pattern)-1:])
 
@@ -99,18 +101,21 @@ class Flow:
         for flow_name in flow_names:
             self.print(flow_name)
 
-    def flow_diff(self, include_test=False):
+    def flow_diff(self, options):
         flow_name = self.get_flow_name()
         feature_name = self.get_feature_name()
         feature_branch = f"feature/{flow_name}/{feature_name}"
         base_branch = self.get_base_branch(flow_name)
 
-        if include_test:
+        if options['test']:
             result = self.exec(f"git diff --stat {feature_branch} {base_branch}")
         else:
             result = self.exec(f"git diff --stat {feature_branch} {base_branch} -- ':(exclude)test/*'")
 
-        self.print(result)
+        if options['oneline']:
+            self.print(result.splitlines()[-1])
+        else:
+            self.print(result)
 
     def push(self):
         flow_name = self.get_flow_name()
@@ -193,12 +198,16 @@ if __name__ == '__main__':
         flow.flow_list()
         sys.exit(0)
     elif args[0] == "diff":
-        if len(args) == 1:
-            flow.flow_diff()
-            sys.exit(0)
-        elif len(args) == 2 and args[1] == "--test":
-            flow.flow_diff(True)
-            sys.exit(0)
+        options = {
+            "test": False,
+            "oneline": False
+        }
+        if "--test" in args[1:]:
+            options["test"] = True
+        if "--oneline" in args[1:]:
+            options["oneline"] = True
+        flow.flow_diff(options)
+        sys.exit(0)
     elif args[0] == "push":
         flow.push()
         sys.exit(0)
