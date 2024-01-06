@@ -1,8 +1,14 @@
+import os
 import sys
 import subprocess
 
 def exec(command, suppress_error=False):
-    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+    lines, columns = subprocess.run("stty size", capture_output=True, text=True, shell=True).stdout.split()
+    env = os.environ.copy()
+    env["LINES"] = lines
+    env["COLUMNS"] = columns
+
+    result = subprocess.run(command, capture_output=True, text=True, shell=True, env=env)
 
     if (not (result.returncode == 0)) and (not suppress_error):
         print(command)
@@ -93,6 +99,19 @@ class Flow:
         for flow_name in flow_names:
             self.print(flow_name)
 
+    def flow_diff(self, include_test=False):
+        flow_name = self.get_flow_name()
+        feature_name = self.get_feature_name()
+        feature_branch = f"feature/{flow_name}/{feature_name}"
+        base_branch = self.get_base_branch(flow_name)
+
+        if include_test:
+            result = self.exec(f"git diff --stat {feature_branch} {base_branch}")
+        else:
+            result = self.exec(f"git diff --stat {feature_branch} {base_branch} -- ':(exclude)test/*'")
+
+        self.print(result)
+
     def push(self):
         flow_name = self.get_flow_name()
         feature_name = self.get_feature_name()
@@ -173,6 +192,13 @@ if __name__ == '__main__':
     elif args[0] == "flow-list":
         flow.flow_list()
         sys.exit(0)
+    elif args[0] == "diff":
+        if len(args) == 1:
+            flow.flow_diff()
+            sys.exit(0)
+        elif len(args) == 2 and args[1] == "--test":
+            flow.flow_diff(True)
+            sys.exit(0)
     elif args[0] == "push":
         flow.push()
         sys.exit(0)
