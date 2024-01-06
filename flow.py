@@ -21,14 +21,14 @@ def exec(command, suppress_error=False):
     return result.stdout
 
 def usage():
-    print("flow init <flow_name> [<base_branch>]")
-    print("flow start <flow_name>")
-    print("flow checkout <feature_name>")
-    print("flow delete <feature_name>")
-    print("flow feature-list")
-    print("flow flow-list")
-    print("flow push")
-    print("flow rebase")
+    print("flow init <flow_name> [<base_branch>]", file=sys.stderr)
+    print("flow start <flow_name>", file=sys.stderr)
+    print("flow checkout <feature_name>", file=sys.stderr)
+    print("flow delete <feature_name>", file=sys.stderr)
+    print("flow feature-list", file=sys.stderr)
+    print("flow flow-list", file=sys.stderr)
+    print("flow push", file=sys.stderr)
+    print("flow rebase", file=sys.stderr)
     sys.exit(1)
 
 class Flow:
@@ -45,6 +45,7 @@ class Flow:
         
         self.set_flow_name(flow_name)
         self.set_base_branch(flow_name, base_branch)
+        self.checkout_base()
 
     def start(self, flow_name):
         base_branch = self.get_base_branch(flow_name)

@@ -54,7 +54,7 @@ function _init_flow_name(){
 function _init_base_branch(){
     local -a list
     list=($(git branch --list "*$line[2]" | sed 's/^[* ] //' | tr '\n' ' '))
-    [[ !  -z  $list  ]] &&  _values 'flow name' $list
+    [[ !  -z  $list  ]] &&  _values 'base branch' $list
 }
 
 function _diff_options(){
