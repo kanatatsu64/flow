@@ -2,6 +2,11 @@ import os
 import sys
 import subprocess
 
+def strip_print(msg):
+    msg = msg.strip()
+    if len(msg) > 0:
+        print(msg)
+
 def exec(command, suppress_error=False):
     env = os.environ.copy()
     stty = subprocess.run("stty size", capture_output=True, text=True, shell=True).stdout
@@ -126,6 +131,15 @@ class Flow:
         else:
             self.print(result)
 
+    def log(self):
+        flow_name = self.get_flow_name()
+        feature_name = self.get_feature_name()
+        feature_branch = f"feature/{flow_name}/{feature_name}"
+        base_branch = self.get_base_branch(flow_name)
+
+        result = self.exec(f"git log --oneline {base_branch}..{feature_branch}")
+        self.print(result)
+
     def push(self):
         flow_name = self.get_flow_name()
         feature_name = self.get_feature_name()
@@ -178,7 +192,7 @@ class Flow:
         return self.exec("cat .git/flow_current_feature").strip()
 
 if __name__ == '__main__':
-    flow = Flow(exec, print)
+    flow = Flow(exec, strip_print)
     args = sys.argv[1:]
 
     if len(args) == 0:
@@ -228,6 +242,9 @@ if __name__ == '__main__':
         if "--oneline" in args[1:]:
             options["oneline"] = True
         flow.diff(options)
+        sys.exit(0)
+    elif args[0] == "log":
+        flow.log()
         sys.exit(0)
     elif args[0] == "push":
         flow.push()

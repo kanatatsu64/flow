@@ -330,5 +330,19 @@ class TestFlow(unittest.TestCase):
         self.assertEqual(history[0], commands[0])
         self.assertEqual(history[1], commands[1])
 
+    def test_flow_log(self):
+        mock = ProcessMock()
+        mock.default("cat .git/flow_current", "sample/1234")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
+        mock.default("cat .git/flow_current_feature", "new")
+        flow = Flow(mock.exec, mock.print)
+
+        flow.log()
+
+        command = "git log --oneline base_branch..feature/sample/1234/new"
+        history = mock.get("git log")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0], command)
+
 if __name__ == '__main__':
     unittest.main()
