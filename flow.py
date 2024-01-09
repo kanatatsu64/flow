@@ -39,6 +39,10 @@ class Flow:
     def init(self, flow_name, base_branch = None):
         if base_branch is None:
             base_branch = f"develop/{flow_name}"
+        elif base_branch == "develop":
+            base_branch = f"develop/{flow_name}"
+        elif base_branch == "feature":
+            base_branch = f"feature/{flow_name}"
         
         if not self.exists(base_branch):
             self.exec(f"git checkout -b {base_branch}")
