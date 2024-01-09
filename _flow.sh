@@ -5,7 +5,7 @@ function _flow_completion(){
 
     case $state in
         command)
-            _values 'subcommand' 'init' 'start' 'checkout' 'delete' 'feature-list' 'flow-list' 'diff' 'push' 'rebase' 'reset'
+            _values 'subcommand' 'init' 'start' 'checkout' 'delete' 'list' 'feature-list' 'flow-list' 'diff' 'push' 'rebase' 'reset'
             ;;
         args)
             case $line[1] in

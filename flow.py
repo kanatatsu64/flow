@@ -209,6 +209,9 @@ if __name__ == '__main__':
         elif len(args) == 2:
             flow.delete(args[1])
             sys.exit(0)
+    elif args[0] == "list":
+        flow.feature_list()
+        sys.exit(0)
     elif args[0] == "feature-list":
         flow.feature_list()
         sys.exit(0)
