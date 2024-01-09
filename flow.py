@@ -85,7 +85,11 @@ class Flow:
 
         self.exec(f"git checkout {base_branch}")
 
-    def delete(self, feature_name):
+    def delete(self, feature_name=None):
+        if feature_name is None:
+            feature_name = self.get_feature_name()
+            self.checkout_base()
+
         flow_name = self.get_flow_name()
         feature_branch = f"feature/{flow_name}/{feature_name}"
 
@@ -199,7 +203,10 @@ if __name__ == '__main__':
             flow.checkout(args[1])
             sys.exit(0)
     elif args[0] == "delete":
-        if len(args) == 2:
+        if len(args) == 1:
+            flow.delete()
+            sys.exit(0)
+        elif len(args) == 2:
             flow.delete(args[1])
             sys.exit(0)
     elif args[0] == "feature-list":

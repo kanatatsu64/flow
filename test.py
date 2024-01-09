@@ -155,7 +155,7 @@ class TestFlow(unittest.TestCase):
         self.assertEqual(history[0], commands[0])
         self.assertEqual(history[1], commands[1])
 
-    def test_delete(self):
+    def test_delete_1(self):
         mock = ProcessMock()
         mock.default("cat .git/flow_current", "sample/1234")
         mock.default("git branch --list feature/sample/1234/new", " feature/sample/1234/new")
@@ -163,6 +163,26 @@ class TestFlow(unittest.TestCase):
 
         feature_name = "new"
         flow.delete(feature_name)
+
+        command = 'git branch -D feature/sample/1234/new'
+        history = mock.get("git branch -D")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0], command)
+
+    def test_delete_2(self):
+        mock = ProcessMock()
+        mock.default("cat .git/flow_current", "sample/1234")
+        mock.default("cat .git/flow_current_feature", "new")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
+        mock.default("git branch --list feature/sample/1234/new", " feature/sample/1234/new")
+        flow = Flow(mock.exec, mock.print)
+
+        flow.delete()
+
+        command = 'git checkout base_branch'
+        history = mock.get("git checkout")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0], command)
 
         command = 'git branch -D feature/sample/1234/new'
         history = mock.get("git branch -D")
