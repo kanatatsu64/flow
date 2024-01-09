@@ -261,6 +261,21 @@ class TestFlow(unittest.TestCase):
         self.assertEqual(len(history), 2)
         self.assertEqual(history[0], commands[0])
         self.assertEqual(history[1], commands[1])
+
+    def test_flow_reset(self):
+        mock = ProcessMock()
+        mock.default("cat .git/flow_current", "sample/1234")
+        mock.default("cat .git/flow/sample_#_1234", "base_branch")
+        flow = Flow(mock.exec, mock.print)
+
+        flow.reset()
+
+        commands = [
+            "git reset base_branch",
+        ]
+        history = mock.get("git")
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0], commands[0])
     
     def test_flow_feature_list(self):
         mock = ProcessMock()

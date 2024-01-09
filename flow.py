@@ -141,6 +141,12 @@ class Flow:
         
         self.exec(f"git fetch origin {base_branch}")
         self.exec(f"git rebase origin/{base_branch}")
+
+    def reset(self):
+        flow_name = self.get_flow_name()
+        base_branch = self.get_base_branch(flow_name)
+        
+        self.exec(f"git reset {base_branch}")
     
     def set_flow_name(self, flow_name):
         self.exec(f"echo \"{flow_name}\" > .git/flow_current")
