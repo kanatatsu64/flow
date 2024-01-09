@@ -42,7 +42,7 @@ class Flow:
         elif base_branch == "develop":
             base_branch = f"develop/{flow_name}"
         elif base_branch == "feature":
-            base_branch = f"feature/{flow_name}"
+            base_branch = f"feature/{flow_name}/base"
         
         if not self.exists(base_branch):
             self.exec(f"git checkout -b {base_branch}")

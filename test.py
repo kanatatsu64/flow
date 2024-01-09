@@ -118,9 +118,9 @@ class TestFlow(unittest.TestCase):
 
     def test_flow_init_5(self):
         mock = ProcessMock()
-        mock.default("git branch --list feature/sample/1234", "* feature/sample/1234")
+        mock.default("git branch --list feature/sample/1234/base", "* feature/sample/1234/base")
         mock.default("cat .git/flow_current", "sample/1234")
-        mock.default("cat .git/flow/sample_#_1234", "feature/sample/1234")
+        mock.default("cat .git/flow/sample_#_1234", "feature/sample/1234/base")
         flow = Flow(mock.exec, mock.print)
 
         flow_name = "sample/1234"
@@ -128,7 +128,7 @@ class TestFlow(unittest.TestCase):
 
         commands = [
             'echo "sample/1234" > .git/flow_current',
-            'echo "feature/sample/1234" > .git/flow/sample_#_1234',
+            'echo "feature/sample/1234/base" > .git/flow/sample_#_1234',
             'echo "" > .git/flow_current_feature',
         ]
         history = mock.get("echo")
