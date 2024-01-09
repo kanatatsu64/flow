@@ -225,5 +225,8 @@ if __name__ == '__main__':
     elif args[0] == "rebase":
         flow.rebase()
         sys.exit(0)
+    elif args[0] == "reset":
+        flow.reset()
+        sys.exit(0)
     
     usage()
