@@ -106,7 +106,7 @@ class Flow:
         for flow_name in flow_names:
             self.print(flow_name)
 
-    def flow_diff(self, options):
+    def diff(self, options):
         flow_name = self.get_flow_name()
         feature_name = self.get_feature_name()
         feature_branch = f"feature/{flow_name}/{feature_name}"
@@ -217,7 +217,7 @@ if __name__ == '__main__':
             options["test"] = True
         if "--oneline" in args[1:]:
             options["oneline"] = True
-        flow.flow_diff(options)
+        flow.diff(options)
         sys.exit(0)
     elif args[0] == "push":
         flow.push()
