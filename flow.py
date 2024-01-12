@@ -44,10 +44,6 @@ class Flow:
     def init(self, flow_name, base_branch = None):
         if base_branch is None:
             base_branch = f"develop/{flow_name}"
-        elif base_branch == "develop":
-            base_branch = f"develop/{flow_name}"
-        elif base_branch == "feature":
-            base_branch = f"feature/{flow_name}/base"
         
         if not self.exists(base_branch):
             self.exec(f"git checkout -b {base_branch}")
@@ -122,9 +118,9 @@ class Flow:
         base_branch = self.get_base_branch(flow_name)
 
         if options['test']:
-            result = self.exec(f"git diff --stat {feature_branch} {base_branch}")
+            result = self.exec(f"git diff --stat {base_branch} {feature_branch}")
         else:
-            result = self.exec(f"git diff --stat {feature_branch} {base_branch} -- ':(exclude)test/*'")
+            result = self.exec(f"git diff --stat {base_branch} {feature_branch} -- ':(exclude)test/*'")
 
         if options['oneline']:
             self.print(result.splitlines()[-1])
@@ -165,6 +161,13 @@ class Flow:
         base_branch = self.get_base_branch(flow_name)
         
         self.exec(f"git reset {base_branch}")
+
+    def back(self):
+        flow_name = self.get_flow_name()
+        feature_name = self.get_feature_name()
+        feature_branch = f"feature/{flow_name}/{feature_name}"
+
+        self.exec(f"git reset origin/{feature_branch}")
     
     def set_flow_name(self, flow_name):
         self.exec(f"echo \"{flow_name}\" > .git/flow_current")
@@ -254,6 +257,9 @@ if __name__ == '__main__':
         sys.exit(0)
     elif args[0] == "reset":
         flow.reset()
+        sys.exit(0)
+    elif args[0] == "back":
+        flow.back()
         sys.exit(0)
     
     usage()
